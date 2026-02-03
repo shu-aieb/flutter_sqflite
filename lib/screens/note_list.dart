@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_sqflite/models/note.dart';
 import 'package:flutter_sqflite/utils/database_helper.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'note_detail.dart';
@@ -27,7 +28,12 @@ class _NoteListState extends State<NoteList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Notes - Sqflite')),
+      appBar: AppBar(
+        title: Text(
+          'Notes - Sqflite',
+          style: GoogleFonts.mochiyPopPOne(fontSize: 18),
+        ),
+      ),
       body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue.shade300,
@@ -44,52 +50,83 @@ class _NoteListState extends State<NoteList> {
   }
 
   ListView getNoteListView() {
-    TextStyle titleStyle = Theme.of(context).textTheme.headlineMedium!;
     return ListView.builder(
       itemCount: count,
       itemBuilder: (BuildContext context, int position) {
-        return Card(
-          color: Colors.white,
-          elevation: 2.0,
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: getPriorityColor(noteList[position].priority),
-              child: getPriorityIcon(noteList[position].priority),
+        final note = noteList[position];
+        return Dismissible(
+          key: Key(noteList[position].id.toString()),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            margin: const EdgeInsets.only(top: 6, bottom: 5),
+            alignment: Alignment.centerRight,
+            color: Colors.redAccent,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 25),
+              child: Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
-            title: Text(noteList[position].title, style: titleStyle),
-            subtitle: Text(noteList[position].date),
-            trailing: GestureDetector(
-              child: Icon(Icons.delete, color: Colors.grey),
-              onTap: () => _delete(context, noteList[position]),
+          ),
+          onDismissed: (_) => _delete(context, note),
+          child: Card(
+            color: Colors.white,
+            elevation: 2.0,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: _getPriorityColor(note.priority),
+                child: _getPriorityIcon(note.priority),
+              ),
+              title: Text(
+                note.title,
+                style: GoogleFonts.deliusSwashCaps(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              subtitle: Text(
+                note.date,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              // trailing: GestureDetector(
+              //   child: Icon(Icons.delete, color: Colors.grey),
+              //   onTap: () => _delete(context, noteList[position]),
+              // ),
+              onTap: () {
+                navigateToDetail('Edit Note', noteList[position]);
+              },
             ),
-            onTap: () {
-              navigateToDetail('Edit Note', noteList[position]);
-            },
           ),
         );
       },
     );
   }
 
-  Icon getPriorityIcon(int priority) {
+  Icon _getPriorityIcon(int priority) {
     if (priority == 1) {
       return Icon(Icons.priority_high, color: Colors.red.shade800);
-    } else {
-      return Icon(Icons.low_priority, color: Colors.yellow.shade800);
     }
+    return Icon(Icons.low_priority, color: Colors.yellow.shade800);
   }
 
-  Color getPriorityColor(int priority) {
-    switch (priority) {
-      case 1:
-        return Colors.red;
-        break;
-      case 2:
-        return Colors.yellow;
-        break;
-      default:
-        return Colors.yellow;
-    }
+  Color _getPriorityColor(int priority) {
+    if (priority == 1) return Colors.red;
+    return Colors.yellow;
+
+    // switch (priority) {
+    //   case 1:
+    //     return Colors.red;
+    //   case 2:
+    //     return Colors.yellow;
+    //   default:
+    //     return Colors.yellow;
+    // }
   }
 
   void _delete(BuildContext context, Note note) async {
