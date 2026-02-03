@@ -18,13 +18,16 @@ class _NoteListState extends State<NoteList> {
   int count = 0;
 
   @override
-  Widget build(BuildContext context) {
-    if (noteList.isEmpty) {
-      updateListView();
-    }
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    updateListView();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Notes')),
+      appBar: AppBar(title: Text('Notes - Sqflite')),
       body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.blue.shade300,
@@ -70,9 +73,9 @@ class _NoteListState extends State<NoteList> {
 
   Icon getPriorityIcon(int priority) {
     if (priority == 1) {
-      return Icon(Icons.play_arrow);
+      return Icon(Icons.priority_high, color: Colors.red.shade800);
     } else {
-      return Icon(Icons.keyboard_arrow_right);
+      return Icon(Icons.low_priority, color: Colors.yellow.shade800);
     }
   }
 
@@ -102,21 +105,27 @@ class _NoteListState extends State<NoteList> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
-    dbFuture.then((database) {
-      Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
-      noteListFuture.then((noteList) {
-        setState(() {
-          this.noteList = noteList;
-          this.count = noteList.length;
-        });
-      });
+  void updateListView() async {
+    final noteList = await databaseHelper.getNoteList();
+    setState(() {
+      this.noteList = noteList;
+      count = noteList.length;
     });
+
+    // final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    // dbFuture.then((database) {
+    //   Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
+    //   noteListFuture.then((noteList) {
+    //     setState(() {
+    //       this.noteList = noteList;
+    //       count = noteList.length;
+    //     });
+    //   });
+    // });
   }
 
   void navigateToDetail(String title, Note note) async {
-    bool result = await Navigator.push(
+    bool? result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) {

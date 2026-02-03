@@ -23,11 +23,17 @@ class _NoteDetailState extends State<NoteDetail> {
   TextEditingController descriptionController = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    TextStyle textStyle = Theme.of(context).textTheme.bodyLarge!;
+  void initState() {
+    // TODO: implement initState
+    super.initState();
 
     titleController.text = widget.note.title;
     descriptionController.text = widget.note.description ?? '';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.bodyLarge!;
 
     return Scaffold(
       appBar: AppBar(
@@ -190,6 +196,7 @@ class _NoteDetailState extends State<NoteDetail> {
 
   void _save() async {
     moveToLastScreen();
+
     widget.note.date = DateFormat.yMMMd().format(DateTime.now());
 
     int result;

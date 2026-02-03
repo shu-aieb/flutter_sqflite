@@ -44,7 +44,7 @@ class DatabaseHelper {
 
   void _createDb(Database db, int newVersion) async {
     await db.execute(
-      'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER, $colDate TEXT',
+      'CREATE TABLE $noteTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER, $colDate TEXT)',
     );
   }
 
@@ -95,12 +95,6 @@ class DatabaseHelper {
 
   Future<List<Note>> getNoteList() async {
     var noteMapList = await getNoteMapList();
-    int count = noteMapList.length;
-    List<Note> noteList = [];
-
-    noteMapList.map((noteMap) {
-      noteList.add(Note.fromMapObject(noteMap));
-    });
-    return noteList;
+    return noteMapList.map((noteMap) => Note.fromMapObject(noteMap)).toList();
   }
 }
